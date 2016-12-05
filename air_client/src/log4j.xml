@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%p - %C{1}.%M(%L) | %m%n"/>
+        </layout>
+    </appender>
+    <appender name="CONSOLE2" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%M(%L) | %m%n"/>
+        </layout>
+    </appender>
+        <appender name="CONSOLE3" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%m%n"/>
+        </layout>
+    </appender>
+	<appender name="CONSOLE4" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%C{1}(%L) | %m%n"/>
+        </layout>
+    </appender>
+	<appender name="CONSOLE5" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%d - %m%n"/>
+        </layout>
+    </appender>        
+    <appender name="ROLLFile" class="org.apache.log4j.RollingFileAppender">
+	    <param name="File" value="ksgerror.log"></param>
+	    <param name="Append" value="false"></param>
+	    <param name="MaxFileSize" value="1000KB"></param>
+	        
+        <layout class="org.apache.log4j.PatternLayout">
+            	<!--  <param name="ConversionPattern" value="%p - %C{1}.%M(%L) | %m%n"></param>
+            	
+            	-->
+            	<param name="ConversionPattern" value="%p - %m%n"></param>
+        	</layout>
+    </appender>
+    <appender name="LogFile" class="org.apache.log4j.FileAppender">    
+        <param name="File" value="log/tacLog.log"></param>
+        <param name="Append" value="true"></param>
+            <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%p - %C{1}.%M(%L) | %m%n"/>
+        </layout>
+    </appender>
+    <appender name="ROLLFile2" class="org.apache.log4j.RollingFileAppender">
+	    <param name="File" value="log/testLog.xml"></param>
+	    <param name="Append" value="false"></param>
+	    <param name="MaxFileSize" value="100KB"></param>
+	    <layout class="org.apache.log4j.xml.XMLLayout"/>	    
+        <!--  <layout class="org.apache.log4j.PatternLayout">
+            	<param name="ConversionPattern" value="%p - %C{1}.%M(%L) | %m%n"></param>
+        	</layout>
+        	-->
+    </appender>
+     
+     <logger name="java.sql.Statement">
+        <level value="info"/>
+    </logger>
+    
+    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientImpl">
+        <level value="info"/>
+    </logger>
+    <logger name="com.ibatis.common.jdbc.SimpleDataSource">
+        <level value="info"/>
+    </logger>
+     
+      <logger name="java.sql.ResultSet">
+        <level value="info"/>
+    </logger>
+     <logger name="java.sql.Connection">
+        <level value="info"/>
+    </logger>
+    
+
+
+<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                value="%5p-%C{1}.%M(%L)-%m%n"/>
+        </layout>
+    </appender>
+    <root>
+        <level value="debug">
+        
+        </level>
+        	
+		<appender-ref ref="CONSOLE5"></appender-ref>
+		 
+		
+    </root></log4j:configuration>
