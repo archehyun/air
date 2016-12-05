@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_condition_humidity">
+
+	
+	<sql id="qid">
+	<dynamic prepend="where query_number in">
+		<isNotNull property="qidList">
+			<iterate open="(" close=")" conjunction="," property="qidList">	
+			#qidList[]#
+			</iterate >
+		</isNotNull>
+		</dynamic>	
+	</sql>
+	<sql id="wqid">
+	<dynamic prepend="where">
+		<isNotNull property="query_number">
+			query_number =#query_number#
+		</isNotNull>
+		</dynamic>		
+	</sql>	
+
+	<select id="select" resultMap="TABLE.ConditionInfoResult" parameterMap="TABLE.ConditionInfoParameter">
+		select * from TB_CONDITION_HUMIDITY
+		<include refid="qid"/>
+		<include refid="wqid"/>	
+	</select>
+	<select id="selectListByTagID" resultMap="TABLE.ConditionInfoResult" parameterClass="buffer.info.ConditionInfo">
+	select * from tb_condition_container,tb_condition_humidity
+	where tb_condition_container.tid=#tid#  and
+	tb_condition_container.query_number=tb_condition_humidity.query_number    
+	</select>
+
+<delete id="delete">
+	delete from tb_condition_humidity
+	<include refid="wqid"/>
+</delete>
+
+<insert id="insert" parameterMap="TABLE.ConditionInfoParameter">
+	insert into tb_condition_humidity
+	
+	(query_number, min, max, isRelative)
+		
+	values
+	
+	(#query_number#, #min#, #max#, 
+	<isNotNull property="isRelative">
+	1
+	</isNotNull>
+	<isNull property="isRelative">
+	0
+	</isNull>
+);	
+</insert>
+				
+</sqlMap>

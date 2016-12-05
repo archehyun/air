@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CONDITION">
+
+	<resultMap class="air.tbm.domain.ConditionInfo" id="conditionMap">
+	<result property="query_number" column="query_number"/>
+	<result property="max" column="max" nullValue="-100" javaType="int"/>
+	<result property="min" column="min" nullValue="100" javaType="int"/>
+	<result property="isRelative" column="isRelative" nullValue="false" />
+	</resultMap>
+	
+	<sql id="qid">
+	<dynamic prepend="where query_number in">
+		<isNotNull property="qidList">
+			<iterate open="(" close=")" conjunction="," property="qidList">	
+			#qidList[]#
+			</iterate >
+		</isNotNull>
+		</dynamic>	
+	</sql>
+	<sql id="wqid">
+	<dynamic prepend="where">
+		<isNotNull property="query_number">
+			query_number =#query_number#
+		</isNotNull>
+		</dynamic>		
+	</sql>	
+	<select id="selectContainer" resultClass="air.tbm.domain.ConditionInfo" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_CONDITION_CONTAINER 
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	
+	</select>
+	<select id="selectAction" resultClass="air.tbm.domain.ConditionInfo" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_ACTION 
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	</select>
+	<select id="selectHit" resultMap="conditionMap" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_CONDITION_HIT
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	</select>
+	<select id="selectDate" resultClass="air.tbm.domain.ConditionInfo" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_CONDITION_DATE
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	</select>
+	<select id="selectHumidity" resultMap="conditionMap" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_CONDITION_HUMIDITY
+		<include refid="qid"/>
+		<include refid="wqid"/>	
+	</select>
+	<select id="selectTemperature" resultMap="conditionMap" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_CONDITION_TEMPERATURE
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	</select>
+	<select id="selectTime" resultClass="air.tbm.domain.ConditionInfo" parameterClass="air.tbm.domain.ConditionInfo">
+		select * from TB_CONDITION_TIME 
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	</select>
+
+<delete id="deleteHit">
+	delete from tb_condition_hit
+	<include refid="wqid"/>
+</delete>
+<delete id="deleteDate">
+	delete from tb_condition_date
+	<include refid="wqid"/>
+</delete>
+<delete id="deleteHumidity">
+	delete from tb_condition_humidity
+	<include refid="wqid"/>
+</delete>
+<delete id="deleteContainer">
+	delete from tb_condition_container
+	<include refid="wqid"/>
+</delete>
+<delete id="deleteTemperature">
+	delete from tb_condition_temperature
+	<include refid="wqid"/>
+</delete>
+
+<delete id="deleteAction">
+	delete from tb_action
+	<include refid="wqid"/>
+</delete>
+
+<insert id="insertHit" parameterClass="air.tbm.domain.ConditionInfo">
+	insert into tb_condition_hit
+	
+	(query_number, min, max, isRelative)
+		
+	values
+	
+	(#query_number#, #min#, #max#, 	<isNotNull property="isRelative">
+	1
+	</isNotNull>
+	<isNull property="isRelative">
+	0
+	</isNull>);
+</insert>
+
+<insert id="insertDate" parameterClass="air.tbm.domain.ConditionInfo">
+	insert into tb_condition_date
+	
+	(query_number, min, max, isRelative)
+		
+	values
+	
+	(#query_number#, #min#, #max#, 	<isNotNull property="isRelative">
+	1
+	</isNotNull>
+	<isNull property="isRelative">
+	0
+	</isNull>);
+	
+</insert>
+
+<insert id="insertHumidity" parameterClass="air.tbm.domain.ConditionInfo">
+	insert into tb_condition_humidity
+	
+	(query_number, min, max, isRelative)
+		
+	values
+	
+	(#query_number#, #min#, #max#, 
+	<isNotNull property="isRelative">
+	1
+	</isNotNull>
+	<isNull property="isRelative">
+	0
+	</isNull>
+);	
+</insert>
+
+<insert id="insertContainer" parameterClass="air.tbm.domain.ConditionInfo">
+	insert into tb_condition_container
+	
+	(query_number, tid, cid)
+	
+	values
+	
+	(#query_number#, #tid#, #cid#);
+	
+</insert>
+
+<insert id="insertTemperature" parameterClass="air.tbm.domain.ConditionInfo">
+	insert into tb_condition_temperature
+
+	(query_number, min, max, isRelative)
+		
+	values
+	
+	(#query_number#, #min#, #max#,	<isNotNull property="isRelative">
+	1
+	</isNotNull>
+	<isNull property="isRelative">
+	0
+	</isNull>);	
+</insert>
+
+<insert id="insertAction" parameterClass="air.tbm.domain.ConditionInfo">
+	insert into tb_action
+	
+	(query_number, date, tid, cid, location, temperature, hit, user_id)
+	
+	values
+	
+	(
+	#query_number#,
+	<isNotNull property="date">
+	1,
+	</isNotNull>
+	<isNull property="date">
+	0,
+	</isNull>
+	<isNotNull property="tid">
+	1,
+	</isNotNull>
+	<isNull property="tid">
+	0,
+	</isNull>
+	<isNotNull property="cid">
+	1,
+	</isNotNull>
+	<isNull property="cid">
+	0,
+	</isNull>	
+	<isNotNull property="location">
+	1,
+	</isNotNull>
+	<isNull property="location">
+	0,
+	</isNull>
+	<isNotNull property="temperature">
+	1,
+	</isNotNull>
+	<isNull property="temperature">
+	0,
+	</isNull>	
+	<isNotNull property="hit">
+	1,
+	</isNotNull>
+	<isNull property="hit">
+	0,
+	</isNull>		
+	#user_id#);	
+</insert>
+				
+</sqlMap>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_condition_container">
+
+
+	
+	<sql id="qid">
+	<dynamic prepend="where query_number in">
+		<isNotNull property="qidList">
+			<iterate open="(" close=")" conjunction="," property="qidList">	
+			#qidList[]#
+			</iterate >
+		</isNotNull>
+		</dynamic>	
+	</sql>
+	<sql id="wqid">
+	<dynamic prepend="where">
+		<isNotNull property="query_number">
+			query_number =#query_number#
+		</isNotNull>
+		</dynamic>		
+	</sql>	
+	<select id="select" resultMap="TABLE.ConditionInfoResult2" parameterClass="buffer.info.ConditionInfo">
+		select * from TB_CONDITION_CONTAINER 
+		<include refid="qid"/>
+		<include refid="wqid"/>
+	
+	</select>
+	
+		<select id="selectListByTagID" resultMap="TABLE.ConditionInfoResult2" parameterClass="buffer.info.ConditionInfo">
+	select * from tb_condition_container
+	where tid=#tid#
+	
+	</select>
+
+<delete id="delete">
+	delete from tb_condition_container
+	<include refid="wqid"/>
+</delete>
+
+
+
+<insert id="insert" parameterClass="buffer.info.ConditionInfo">
+	insert into tb_condition_container
+	
+	(query_number, tid, cid)
+	
+	values
+	
+	(#query_number#, #tid#, #cid#);
+	
+</insert>
+				
+</sqlMap>

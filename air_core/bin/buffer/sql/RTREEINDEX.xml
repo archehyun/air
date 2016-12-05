@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_rtreeindex">
+
+
+	<select id="select" resultClass="lib.rtree.RtreeIndexNode" parameterClass="lib.rtree.RtreeIndexNode">
+		select * from tb_rtreeindex 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="nodeID">	
+			nodeID=#nodeID#
+			</isNotNull>
+		</dynamic>
+		
+	</select>
+	<select id="selectMap" resultClass="hashmap" parameterClass="lib.rtee2.RtreeIndexNode2">
+		select * from tb_rtreeindex 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="nodeID">	
+			nodeID=#nodeID#
+			</isNotNull>
+		</dynamic>
+		
+	</select>	
+	<select id="selectLastNodeID" resultClass="long" >
+	    select max(nodeID) from tb_rtreeindex
+	    <!--  select max(nodeID) from tb_rtreeindex where isLeafInt=1-->
+	</select>
+
+	<insert id="insert" parameterClass="lib.rtree.RtreeIndexNode">
+		insert into tb_rtreeindex
+		(
+			nodeID,
+			parentNodeID,
+			parentEntryID,
+			isLeafInt,
+			nEntry,
+			mbr1,mbr2,mbr3,mbr4,mbr5,mbr6,mbr7,mbr8,mbr9,mbr10,mbr11,mbr12,mbr13,mbr14,mbr15,
+			children1,children2,children3,children4,children5,children6,children7,children8,
+			children9,children10,children11,children12,children13,children14,children15,
+			mbr1_x1,mbr1_y1,mbr1_x2,mbr1_y2,
+			mbr2_x1,mbr2_y1,mbr2_x2,mbr2_y2,
+			mbr3_x1,mbr3_y1,mbr3_x2,mbr3_y2,
+			mbr4_x1,mbr4_y1,mbr4_x2,mbr4_y2,
+			mbr5_x1,mbr5_y1,mbr5_x2,mbr5_y2
+		)
+		values
+		(
+			#nodeID#,
+			#parentNodeID#,
+			#parentEntryID#,
+			#isLeafInt#,
+			#nEntry#,
+			#mbr1#,#mbr2#,#mbr3#,#mbr4#,#mbr5#,#mbr6#,#mbr7#,#mbr8#,#mbr9#,#mbr10#,#mbr11#,#mbr12#,#mbr13#,#mbr14#,#mbr15#,
+			#children1#,#children2#,#children3#,#children4#,#children5#,#children6#,#children7#,#children8#,
+			#children9#,#children10#,#children11#,#children12#,#children13#,#children14#,#children15#,
+			#mbr1_x1#,#mbr1_y1#,#mbr1_x2#,#mbr1_y2#,
+			#mbr2_x1#,#mbr2_y1#,#mbr2_x2#,#mbr2_y2#,
+			#mbr3_x1#,#mbr3_y1#,#mbr3_x2#,#mbr3_y2#,
+			#mbr4_x1#,#mbr4_y1#,#mbr4_x2#,#mbr4_y2#,
+			#mbr5_x1#,#mbr5_y1#,#mbr5_x2#,#mbr5_y2#
+
+		)
+	</insert>
+	<delete id="delete" parameterClass="lib.rtree.RtreeIndexNode">
+		delete from tb_rtreeindex
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="nodeID">	
+			nodeID=#nodeID#
+			</isNotNull>
+		</dynamic>
+	</delete>
+	<delete id="deleteAll" parameterClass="lib.rtree.RtreeIndexNode">
+		delete from tb_rtreeindex where nodeID !=0		
+	</delete>
+	
+	<update id="update" parameterClass="lib.rtree.RtreeIndexNode">
+	update tb_rtreeindex set 
+	parentNodeID=#parentNodeID#,
+	parentEntryID=#parentEntryID#, 
+	isLeafInt=#isLeafInt#,
+	nEntry = #nEntry#,
+	mbr1=#mbr1#,
+	mbr2=#mbr2#,
+	mbr3=#mbr3#,
+	mbr4=#mbr4#,
+	mbr5=#mbr5#,
+	mbr6=#mbr6#,
+	mbr7=#mbr7#,
+	mbr8=#mbr8#,
+	mbr9=#mbr9#,
+	mbr10=#mbr10#,
+	mbr11=#mbr11#,
+	mbr12=#mbr12#,
+	mbr13=#mbr13#,
+	mbr14=#mbr14#,
+	mbr15=#mbr15#,
+	children1=#children1#,
+	children2=#children2#,
+	children3=#children3#,
+	children4=#children4#,
+	children5=#children5#,
+	children6=#children6#,
+	children7=#children7#,
+	children8=#children8#,
+	children9=#children9#,
+	children10=#children10#,
+	children11=#children11#,
+	children12=#children12#,
+	children13=#children13#,
+	children14=#children14#,
+	children15=#children15#,
+	
+	mbr1_x1=#mbr1_x1#,
+	mbr1_y1=#mbr1_y1#,
+	mbr1_x2=#mbr1_x2#,
+	mbr1_y2=#mbr1_y2#,
+	
+	mbr2_x1=#mbr2_x1#,
+	mbr2_y1=#mbr2_y1#,
+	mbr2_x2=#mbr2_x2#,
+	mbr2_y2=#mbr2_y2#,
+	
+	mbr3_x1=#mbr3_x1#,
+	mbr3_y1=#mbr3_y1#,
+	mbr3_x2=#mbr3_x2#,
+	mbr3_y2=#mbr3_y2#,
+	
+	mbr4_x1=#mbr4_x1#,
+	mbr4_y1=#mbr4_y1#,
+	mbr4_x2=#mbr4_x2#,
+	mbr4_y2=#mbr4_y2#,
+	
+	mbr5_x1=#mbr5_x1#,
+	mbr5_y1=#mbr5_y1#,
+	mbr5_x2=#mbr5_x2#,
+	mbr5_y2=#mbr5_y2#
+	
+	where nodeID=#nodeID#
+	</update>
+				
+</sqlMap>

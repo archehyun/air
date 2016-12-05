@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_location">
+
+
+	<select id="selectLogistic" resultClass="spatial.LogisticsArea" parameterClass="spatial.LogisticsArea">
+		select * from tb_location 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="location_code">	
+			location_code=#location_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="location_name">	
+			location_name=#location_name#
+			</isNotNull>
+		</dynamic>
+		order by location_name;
+	</select>
+	
+	<select id="selectSEQEvent" resultClass="buffer.info.SpatialEventInfo" parameterClass="buffer.info.SpatialEventInfo">
+		select * from tb_spatial_event
+	</select>	
+
+	<select id="select" resultClass="buffer.info.LocationInfo" parameterClass="buffer.info.LocationInfo">
+		select * from tb_location 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="location_code">	
+			location_code=#location_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="location_name">	
+			location_name=#location_name#
+			</isNotNull>
+		</dynamic>
+		
+	</select>
+	<select id="selectGate" resultClass="buffer.info.LocationInfo" parameterClass="buffer.info.LocationInfo">
+		select * from tb_gate 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="gate_code">	
+			gate_code=#gate_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="gate_name">	
+			gate_name=#gate_name#
+			</isNotNull>
+		</dynamic>
+		
+	</select>	
+	
+	
+
+	<insert id="insert" parameterClass="buffer.info.LocationInfo">
+		insert into tb_location 
+		(
+			location_code,
+			location_name,
+			x1,
+			y1,
+			x2,
+			y2,
+			x3,
+			y3,
+			x4,
+			y4,
+			direction,
+			gate
+		)
+		values
+		(
+			#location_code#,
+			#location_name#,
+			#x1#,
+			#y1#,
+			#x2#,
+			#y2#,
+			#x3#,
+			#y3#,
+			#x4#,
+			#y4#,
+			#direction#,
+			#gate#
+		)
+	</insert>
+	<insert id="insertSEQEvent" parameterClass="buffer.info.SpatialEventInfo">
+		insert into tb_spatial_event 
+		(
+			event_type,
+			location_code,
+			tid,
+			cid,
+			event_time	
+		
+		)
+		values
+		(
+			#event_type#,
+			#location_code#,
+			#tid#,
+			#cid#,			
+			curtime()
+		)
+	</insert>
+	<delete id="deleteSEQEvent" parameterClass="buffer.info.SpatialEventInfo">
+		delete from tb_spatial_event 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="location_code">	
+			location_code=#location_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="tid">	
+			tid=#tid#
+			</isNotNull>
+			<isNotNull prepend="and" property="cid">	
+			cid=#cid#
+			</isNotNull>
+			<isGreaterThan prepend="and" property="event_number" compareValue="0">	
+			event_number=#event_number#
+			</isGreaterThan>
+		</dynamic>		
+	</delete>
+	<delete id="delete" parameterClass="buffer.info.LocationInfo">
+		delete from tb_location 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="location_code">	
+			location_code=#location_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="location_name">	
+			location_name=#location_name#
+			</isNotNull>
+		</dynamic>		
+	</delete>		
+	<update id="update" parameterClass="buffer.info.LocationInfo">
+	 update tb_location
+	 set 
+	 location_name=#location_name#,
+	 x1 = #x1#,
+	 y1 = #y1#,
+	 x2 = #x2#,
+	 y2 = #y2#,
+	 x3 = #x3#,
+	 y3 = #y3#,
+	 x4 = #x4#,
+	 y4 = #y4#,	
+	 direction=#direction#,
+	 gate=#gate#
+	 where location_code=#location_code#		
+	</update>	
+
+
+	<select id="selectListGate" resultClass="buffer.info.LocationInfo" parameterClass="buffer.info.LocationInfo">
+		select * from tb_gate 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="location_code">	
+			location_code=#location_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="gate_code">	
+			gate_code=#gate_code#
+			</isNotNull>
+			<isNotNull prepend="and" property="gate_name">	
+			gate_name=#gate_name#
+			</isNotNull>
+		</dynamic>
+		
+	</select>			
+</sqlMap>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_action">
+
+
+	
+	<sql id="qid">
+	<dynamic prepend="where query_number in">
+		<isNotNull property="qidList">
+			<iterate open="(" close=")" conjunction="," property="qidList">	
+			#qidList[]#
+			</iterate >
+		</isNotNull>
+		
+		</dynamic>	
+	</sql>
+	<sql id="wqid">
+	<dynamic prepend="where">
+		<isNotNull property="query_number">
+			query_number =#query_number#
+		</isNotNull>
+		</dynamic>		
+	</sql>	
+
+	<select id="select" resultClass="buffer.info.ActionInfo" parameterClass="buffer.info.ActionInfo">
+		select * from TB_ACTION 
+		<include refid="wqid"/>
+	</select>
+	<select id="selectQueryIDList" resultClass="buffer.info.ActionInfo" parameterClass="buffer.info.ActionInfo">
+		select * from TB_ACTION 
+		where
+		user_id = #user_id#
+	</select>
+	
+
+
+<delete id="delete">
+	delete from tb_action
+	<include refid="wqid"/>
+</delete>
+
+<select id="selectMaxQueryID" resultClass="int">
+		SELECT max(CAST(query_number AS UNSIGNED)) FROM air.tb_action;
+</select>
+	
+
+<!-- 1: true, 0:false -->
+
+<insert id="insert" parameterClass="buffer.info.ActionInfo">
+	insert into tb_action
+	
+	(query_number, date, tid, cid, location, temperature, hit, user_id)
+	
+	values
+	
+	(
+	#query_number#,
+	<isNotNull property="date">
+	1,
+	</isNotNull>
+	<isNull property="date">
+	0,
+	</isNull>
+	<isNotNull property="tid">
+	1,
+	</isNotNull>
+	<isNull property="tid">
+	0,
+	</isNull>
+	<isNotNull property="cid">
+	1,
+	</isNotNull>
+	<isNull property="cid">
+	0,
+	</isNull>	
+	<isNotNull property="location">
+	1,
+	</isNotNull>
+	<isNull property="location">
+	0,
+	</isNull>
+	<isNotNull property="temperature">
+	1,
+	</isNotNull>
+	<isNull property="temperature">
+	0,
+	</isNull>	
+	<isNotNull property="hit">
+	1,
+	</isNotNull>
+	<isNull property="hit">
+	0,
+	</isNull>		
+	#user_id#);	
+</insert>
+				
+</sqlMap>

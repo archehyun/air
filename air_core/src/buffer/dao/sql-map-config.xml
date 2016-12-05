@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMapConfig PUBLIC
+  "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+  "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+ 
+	<properties resource="buffer/properties/db.properties"/>
+	 
+	<settings enhancementEnabled="true" useStatementNamespaces="true" />
+	
+	 <transactionManager type="JDBC">
+		<dataSource type="SIMPLE">
+
+
+		<property name="JDBC.Driver" value="${mysql.driver}" />
+		<property name="JDBC.Username" value="${mysql.id}"/>
+
+		<property name="JDBC.Password" value="${mysql.password}" />		
+		<property name="JDBC.ConnectionURL" value="${mysql.url}"/>
+		<property name="Pool.MaximumActiveConnections" value="10"/>
+		<property name="Pool.MaximumIdleConnections" value="5"/>
+		<property name="Pool.MaximumCheckoutTime" value="120000"/>
+		<property name="Pool.TimeToWait" value="10000"/>
+		<property name="Pool.PingQuery" value="select * from dual"/>
+		<property name="Pool.PingEnabled" value="true"/>
+		<property name="Pool.PingConnectionOlderThan" value="0"/>
+		<property name="Pool.PingConnectionNotUsedFor" value="0"/>
+
+		</dataSource>
+	</transactionManager>
+	<sqlMap resource="buffer/sql/TABLE.xml" />
+	<sqlMap resource="buffer/sql/CONTAINER.xml" />  
+	<sqlMap resource="buffer/sql/CONDITION_CONTAINER.xml" />
+	<sqlMap resource="buffer/sql/CONDITION_DATE.xml" />
+	<sqlMap resource="buffer/sql/CONDITION_HIT.xml" />
+	<sqlMap resource="buffer/sql/CONDITION_HUMIDITY.xml" />
+	<sqlMap resource="buffer/sql/CONDITION_TEMPERATURE.xml" />
+	<sqlMap resource="buffer/sql/CONDITION_ACTION.xml" />
+	<sqlMap resource="buffer/sql/TAG.xml" />
+	<sqlMap resource="buffer/sql/TAGUSER.xml" />
+	<sqlMap resource="buffer/sql/LOCATION.xml" />
+	<sqlMap resource="buffer/sql/USER.xml" />
+	<sqlMap resource="buffer/sql/MASTER.xml" />
+	<sqlMap resource="buffer/sql/RTREEINDEX.xml" />
+	
+</sqlMapConfig>

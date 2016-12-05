@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DfTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_tag">
+	<parameterMap class="buffer.info.TagInfo" id="tagInfo">
+	   <parameter property="tid" javaType="String"/> 
+	   <parameter property="tag_interval" javaType="int"/>
+	   <parameter property="is_activate" javaType="String" />
+	</parameterMap>
+
+	<select id="select" resultClass="buffer.info.TagInfo" parameterClass="buffer.info.TagInfo">
+		select * from tb_tag 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="tid">	
+			tid=#tid#
+			</isNotNull>
+			<isNotNull prepend="and" property="is_activate">
+			is_activate=#is_activate#
+			</isNotNull>
+		</dynamic>
+	</select>
+	<select id="selectByID" resultClass="buffer.info.TagInfo" parameterClass="string">
+		select * from tb_tag where tid=#tid#		
+	</select>	
+	
+	
+		<select id="selectGroupBy" resultClass="string">
+		select tid from tb_tag group by tid 
+
+	</select>
+	
+	
+	<select id="selectResult" resultClass="buffer.info.ResultInfo" parameterClass="buffer.info.ResultInfo">
+	select * from tb_result
+	<isNotNull prepend="where" property="tid"> 
+	   	tid=#tid#	
+	</isNotNull>
+	order by tb_time desc
+	</select>
+	<select id="selectResultHistory" resultClass="buffer.info.ResultInfo" parameterClass="buffer.info.ResultInfo">
+	select * from tb_result_history
+	<isNotNull prepend="where" property="tid"> 
+	   	tid=#tid#	
+	</isNotNull>
+	order by tb_time desc
+	</select>
+
+	<!--   -->
+	<select id="selectResultGroupByTID" resultClass="string">
+	select tid from tb_result group by tid order by tid 
+	</select>
+	
+	
+	<select id="selectResultHistoryGroupByTID" resultClass="string">
+	select tid from tb_result_history group by tid order by tid 
+	</select>
+	
+
+	
+	<insert id="insert" parameterClass="buffer.info.TagInfo">
+		insert into tb_tag ( tid, is_activate, battery, time_interval,  update_time )
+		
+		values
+		
+		(#tid#, #is_activate#,#battery#, #time_interval#,  curtime())
+	</insert>
+	
+	
+	<!--
+	insert into tb_result ( tid, temperature, humidity,  lat, lng, update_time  )
+		
+		values
+		
+		(#tid#, #temperature#, #humidity#,  #lat#, #lng#, curtime() ) 
+	 -->
+	 
+	 
+	 	<insert id="insertResultHistory" parameterClass="buffer.info.ResultInfo">
+		
+		
+		insert into tb_result_history ( tid, tb_time, humidity, temperature,hit,lat,lng,door)
+		
+		values
+		
+		(#tid#, #tb_time#, #humidity#,#temperature#,#hit#,#lat#,#lng#,#door#)
+		
+	</insert>
+	 
+	<insert id="insertResult" parameterClass="buffer.info.ResultInfo">
+		
+		
+		insert into tb_result ( tid, tb_time, humidity, temperature,hit,lat,lng,door)
+		
+		values
+		
+		(#tid#, curtime(), #humidity#,#temperature#,#hit#,#lat#,#lng#,#door#)
+		
+	</insert>
+	
+	<delete id="deleteResult" parameterClass="buffer.info.ResultInfo">
+	    	delete from tb_result
+	    	<isNotNull prepend="where" property="tid"> 
+	    	tid=#tid#	
+	    	</isNotNull>
+	</delete>
+	<delete id="deleteResultHistory" parameterClass="buffer.info.ResultInfo">
+	    	delete from tb_result_history
+	    	<isNotNull prepend="where" property="tid"> 
+	    	tid=#tid#	
+	    	</isNotNull>
+	</delete>	
+	<delete id="delete" parameterClass="buffer.info.TagInfo">
+	    	delete from tb_tag
+	    	<isNotNull prepend="where" property="tid"> 
+	    	tid=#tid#	
+	    	</isNotNull>
+	</delete>		
+	<update id="update" parameterClass="buffer.info.TagInfo">
+	    update tb_tag set is_activate=#is_activate# 
+	    <dynamic prepend="where">
+			<isNotNull property="tid">	
+			tid=#tid#
+			</isNotNull>			
+		</dynamic>
+
+	</update>		
+	
+				
+</sqlMap>

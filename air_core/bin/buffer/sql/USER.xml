@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (c) 2010 IBM Corporation and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        IBM Corporation - initial API and implementation
+ -->
+
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="tb_user">
+
+
+	<select id="select" resultClass="buffer.info.UserInfo" parameterClass="buffer.info.UserInfo">
+		select * from tb_user
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="user_id">	
+			user_id=#user_id#
+			</isNotNull>
+			<isNotNull prepend="and" property="user_name">	
+			user_id=#user_id#
+			</isNotNull>
+		</dynamic>
+		
+	</select>
+
+	<insert id="insert" parameterClass="buffer.info.UserInfo">
+		insert into tb_user
+		(
+			user_id,
+			user_pw,
+			company,
+			position,
+			user_name			
+		)
+		values
+		(
+			#user_id#,
+			#user_pw#,
+			#company#,
+			#position#,
+			#user_name#
+		)
+	</insert>
+	
+	<delete id="delete" parameterClass="buffer.info.UserInfo">
+		delete from tb_user
+	    <isNotNull prepend="where" property="user_id"> 
+	    	user_id=#user_id#	
+	    </isNotNull>		
+	</delete>
+	
+			
+	<update id="update" parameterClass="buffer.info.UserInfo">		
+	</update>	
+		
+				
+</sqlMap>
