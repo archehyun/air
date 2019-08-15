@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
 import io.InboundListener;
 import msg.node.MsgForAPI;
 import msg.queue.MsgQueueForAPI;
@@ -20,9 +22,9 @@ import msg.queue.MsgQueueForAPI;
  * @version     0.1       
  */
 public class InboundAPIListener extends InboundListener implements Runnable{
-	
+
 	ServerProcess serverProcess;
-	
+
 	private static InboundAPIListener apiServerListener; // ApiServerListener 객체 인스턴스
 
 	static {
@@ -38,13 +40,13 @@ public class InboundAPIListener extends InboundListener implements Runnable{
 
 	private InboundAPIListener() {
 		port=10001; // IP port:default:10001
-			clientList = new HashMap<String, InboundAPIInterfaceImpl>();
+		clientList = new HashMap<String, InboundAPIInterfaceImpl>();
 
-			serverProcess = new ServerProcess();
+		serverProcess = new ServerProcess();
 
-			
-			new Thread(serverProcess).start();
-		
+
+		new Thread(serverProcess).start();
+
 	}
 
 	public static InboundAPIListener getInstance() {
@@ -57,7 +59,7 @@ public class InboundAPIListener extends InboundListener implements Runnable{
 	 * @return	1씩 증가된 queryID		
 	 */
 	private int queryID = 0; // 질의 등록 및 관리를 위한 고유 번호
-	
+
 	public int addQueryID() {				
 		return ++queryID;
 	}
@@ -68,42 +70,44 @@ public class InboundAPIListener extends InboundListener implements Runnable{
 		try {
 			serverSocket = new ServerSocket(port);
 			logger.info("AIR Service Platform("+InetAddress.getLocalHost().getHostAddress()+") Starting..");
-		
 
-		logger.info("API Server("+ serverSocket.getLocalPort() + ") Starting...\n");
 
-		while (isStarted) {
-			try{
-				socket = serverSocket.accept();			
+			logger.info("API Server("+ serverSocket.getLocalPort() + ") Starting...\n");
 
-				String socketInfo = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
-				
-				logger.info("access:"+socketInfo);
+			while (isStarted) {
+				try{
+					socket = serverSocket.accept();			
 
-				if(!clientList.containsKey(socket.getInetAddress().getHostAddress()))
-				{
-					logger.info(socketInfo + " -----> 연결 성공");
+					String socketInfo = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
 
-					InboundAPIInterfaceImpl client=new InboundAPIInterfaceImpl(this, socket, socketInfo);					
+					logger.info("access:"+socketInfo);
 
-					clientList.put(socket.getInetAddress().getHostAddress(), client);
-					
-					notifyMonitor("login:"+socketInfo);
-				}
-				else
-				{
-					logger.info(socketInfo + " -----> 기존 연결 존재");
-				}
+					if(!clientList.containsKey(socket.getInetAddress().getHostAddress()))
+					{
+						logger.info(socketInfo + " -----> 연결 성공");
 
-			} catch (IOException e) {
+						InboundAPIInterfaceImpl client=new InboundAPIInterfaceImpl(this, socket, socketInfo);					
 
-				logger.error("소켓 에러:"+e.getMessage());
-				e.printStackTrace();
-			}			
-		}
+						clientList.put(socket.getInetAddress().getHostAddress(), client);
+
+						notifyMonitor("login:"+socketInfo);
+					}
+					else
+					{
+						logger.info(socketInfo + " -----> 기존 연결 존재");
+					}
+
+				} catch (IOException e) {
+
+					logger.error("소켓 에러:"+e.getMessage());
+					e.printStackTrace();
+				}			
+			}
 		} catch (IOException e) {
-
+			
 			logger.error("에러:"+e.getMessage());
+			JOptionPane.showMessageDialog(null, "포트가 사용 중입니다.");
+			System.exit(0);
 		}
 	}
 	public boolean removeClient(String host)
@@ -111,7 +115,7 @@ public class InboundAPIListener extends InboundListener implements Runnable{
 		if(clientList.containsKey(host))
 		{
 			clientList.remove(host);
-			
+
 			return true;
 		}
 		else
@@ -122,24 +126,24 @@ public class InboundAPIListener extends InboundListener implements Runnable{
 	class ServerProcess implements Runnable
 	{
 		MsgQueueForAPI queue = MsgQueueForAPI.getInstance();
-		
+
 		@Override
 		public void run() {
 
 			while(isStarted)
 			{
 				MsgForAPI api = (MsgForAPI) queue.poll();
-				
+
 				String userID=api.getUserID();
-				
+
 				Set keys= clientList.keySet();
-				
+
 				Iterator iter  = keys.iterator();
-				
+
 				while(iter.hasNext())
 				{
 					InboundAPIInterfaceImpl client=clientList.get(iter.next());
-					
+
 					if(client.getUser_id().equals(userID))
 					{
 						try {
@@ -148,7 +152,7 @@ public class InboundAPIListener extends InboundListener implements Runnable{
 						} catch (IOException e) {
 
 							e.printStackTrace();
-							
+
 							clientList.remove(userID);
 						}
 					}

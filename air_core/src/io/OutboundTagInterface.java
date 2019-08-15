@@ -43,6 +43,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 	private final byte ACTUATOR						 = 	(byte)0x49;
 	
 	private final byte ETX1						 	 =	(byte)0x2D;
+	
 	private final byte ETX2						 	 =	(byte)0x2A;
 	
 
@@ -113,7 +114,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 		}catch(NullPointerException ee)
 		{
 			logger.error("IP is null:"+msg.getTagIPaddr());
-			ee.printStackTrace();
+			//ee.printStackTrace();
 			
 			return;
 		}
@@ -160,7 +161,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 				buffer.append(toHex(message[i])+" ");
 				
 			}
-			notifyMonitor(dateFormat.format(System.currentTimeMillis())+"a ctivation packet2=>"+buffer.toString()+",ip:"+addr+":"+outbound_port);
+			//notifyMonitor(dateFormat.format(System.currentTimeMillis())+" activation packet2=>"+buffer.toString()+",ip:"+addr+":"+outbound_port);
 			
 			logger.info(dateFormat.format(System.currentTimeMillis())+" activation packet2=>"+buffer.toString());
 
@@ -218,7 +219,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 
 			TagControlMsgForDistanceConditionChange item = ( TagControlMsgForDistanceConditionChange) node;
 			
-			notifyMonitor(dateFormat.format(System.currentTimeMillis())+" "+item.getTagIPaddr()+" DISTANCE_CNODITION "+item.getTid());
+			
 
 			message = new byte[14];
 			
@@ -252,7 +253,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 			message[12] = ETX1;
 			
 			message[13] = ETX2;
-
+			notifyMonitor(dateFormat.format(System.currentTimeMillis())+" "+item.getTagIPaddr()+" DISTANCE_CNODITION     "+item.getTid()+" "+item.getMovingDistance());
 
 		}
 		else if(node instanceof TagControlMsgForQueryConditionChange) //0x45
@@ -260,7 +261,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 			logger.info("QUERY_CONDITION");
 			
 			TagControlMsgForQueryConditionChange item = (TagControlMsgForQueryConditionChange) node;
-			notifyMonitor(dateFormat.format(System.currentTimeMillis())+" "+item.getTagIPaddr()+" QUERY_CONDITION "+ item.getTid());
+			notifyMonitor(dateFormat.format(System.currentTimeMillis())+" "+item.getTagIPaddr()+" QUERY_CONDITION        "+ item.getTid());
 			
 
 
@@ -396,7 +397,7 @@ public class OutboundTagInterface extends AIRThread implements Runnable{
 		dsocket = new DatagramSocket();
 		dsocket.send(packet);
 		dsocket.close();
-		//notifyMonitor("outbund i/f=>SEND ACTIVATION_REQUEST_ACK "+tid+",ip:"+ip);
+		//notifyMonitor("outbund i/f=>SEND ACTIVATION_REQUEST_ACK "+tid+",ip:"+ip+",port:"+outbound_port);
 		
 
 	}

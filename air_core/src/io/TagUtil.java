@@ -28,6 +28,55 @@ public class TagUtil {
 				+ (Double.parseDouble(String.valueOf(c)) * 0.0001)) / 60;
 		return tempLatitude;
 	}
+	
+	
+	/**위치 정보 추출
+	 * @param payload
+	 * @return
+	 */
+	public double[] extractedLatLng(byte[] payload) {
+		//logger.debug("extracted latlng start...");
+		//logger.debug("extracted lat data");
+		/*logger.debug("palyload data=>palyload[7]:"+payload[7]+
+									" palyload[8]:"+payload[8]+
+									" palyload[9]:"+payload[9]+
+									" palyload[10]:"+payload[10]);*/
+
+		double[] temp_latlng = new double[2];
+
+		/*
+		 * 위도 좌표 계산
+		 */
+		strLatitude = payload[7] + "." + payload[8] + payload[9] + payload[10];
+		//logger.debug("도분 표기법(lat):"+ payload[7] + "." + payload[8] + payload[9] + payload[10]);				
+		// 도분 표기법 ---------> 도 표기법으로 변환		
+
+		temp_latlng[0] = Double.parseDouble(String.format("%.6f", (Double.valueOf(payload[7]) + doNotation(payload[8], payload[9], payload[10]))));
+		//logger.debug("<lat result:"+temp_latlng[0]+">");
+
+
+		/*
+		 * 경위 자표 계산
+		 */
+		strLongitude = (payload[12] & 0xFF) + "." + payload[13] + payload[14] + payload[15];
+		/*logger.debug("도분 표기법(lng):"+(payload[12] & 0xFF) + "." + payload[13] + payload[14] + payload[15]);
+		logger.debug("extracted lng data");
+		logger.debug("palyload data=>palyload[12]:"+payload[12]+
+									" palyload[13]:"+payload[13]+
+									" palyload[14]:"+payload[14]+
+									" palyload[15]:"+payload[15]);*/
+
+		// 도분 표기법 ---------> 도 표기법으로 변환	
+		temp_latlng[1] = Double.parseDouble(String.format("%.6f", (Double.valueOf((payload[12]) & 0xFF) +  doNotation(payload[13], payload[14], payload[15]))));
+		/*		logger.debug("<lng result:"+temp_latlng[1]+">");
+
+		logger.debug("extracted latlng end...");*/
+
+		//temp_latlng[0] = Double.valueOf(strLatitude); 
+		//temp_latlng[1] = Double.valueOf(strLongitude);
+		return temp_latlng;
+	}
+	
 	/**위치 정보 추출
 	 * 
 	 * @구조 위도(4byte), 위도 방향(1byte), 경도(4byte), 경도 방향(1byte)
@@ -48,13 +97,17 @@ public class TagUtil {
 		 * 1byt : 위도 방향
 		 * 
 		 */
-		strLatitude = payload[latStartIndex] + "." + String.format("%02d",payload[latStartIndex+1]) + String.format("%02d",payload[latStartIndex+2]) + String.format("%02d",payload[latStartIndex+3]);
+		strLatitude = (payload[11] & 0xFF) + "." + 
+		             String.format("%02d",payload[12]) + 
+		             String.format("%02d",payload[13]) + 
+		             String.format("%02d",payload[14]);
 		
 		
 
 		// 도분 표기법 ---------> 도 표기법으로 변환		
 
-		temp_latlng[0] = Double.parseDouble(String.format("%.6f", (Double.valueOf(payload[latStartIndex]) + doNotation(payload[latStartIndex+1], payload[latStartIndex+2], payload[latStartIndex+3]))));
+		temp_latlng[0] = Double.parseDouble(String.format("%.6f", (Double.valueOf(payload[latStartIndex]) 
+				+ doNotation(payload[latStartIndex+1], payload[latStartIndex+2], payload[latStartIndex+3]))));
 
 		/*
 		 * 경도 좌표 계산
@@ -62,7 +115,9 @@ public class TagUtil {
 		 * 1byt : 경도 방향
 		 */
 		int lngStartIndex = startIndex+5;// latidue-d:4+latidue:1
-		strLongitude = (payload[lngStartIndex] & 0xFF) + "." + String.format("%02d",payload[lngStartIndex+1]) + String.format("%02d",payload[lngStartIndex+2]) + String.format("%02d",payload[lngStartIndex+3]);
+		strLongitude = (payload[15] & 0xFF) + "." + 
+		              String.format("%02d",payload[16]) + 
+				      String.format("%02d",payload[17]) + String.format("%02d",payload[18]);
 		//logger.debug("도분 표기법(lng):"+(payload[12] & 0xFF) + "." + payload[13] + payload[14] + payload[15]);
 
 
@@ -71,9 +126,22 @@ public class TagUtil {
 
 		// 도분 표기법 ---------> 도 표기법으로 변환	
 		temp_latlng[1] = Double.parseDouble(String.format("%.6f", (Double.valueOf((payload[lngStartIndex]) & 0xFF) +  doNotation(payload[lngStartIndex+1], payload[lngStartIndex+2], payload[lngStartIndex+3]))));
+		
+		
+		byte lat[] = new byte[4];
+		byte lng[] = new byte[4];
+		lat[0] = payload[startIndex++];
+		lat[1] = payload[startIndex++];
+		lat[2] = payload[startIndex++];
+		lat[3] = payload[startIndex++];
+		
+		lng[0] = payload[startIndex++];
+		lng[1] = payload[startIndex++];
+		lng[2] = payload[startIndex++];
+		lng[3] = payload[startIndex++];
 
-		//temp_latlng[0] =Double.parseDouble(strLatitude);
-		//temp_latlng[1] =Double.parseDouble(strLongitude);
+		temp_latlng[0] =TagUtil.convertByteToDouble(lat);
+		temp_latlng[1] =TagUtil.convertByteToDouble(lng);
 
 		return temp_latlng;
 	}
@@ -91,27 +159,13 @@ public class TagUtil {
 	 * @return
 	 */
 	public String extractedTID(byte[] payload, int startIndex) {
-		/*			String tid = new String(payload, 2, 1);
 
-		int intTid = (((int)payload[3] & 0xFF) << 16) + (((int)payload[4] & 0xFF) << 8) + ((int)payload[5] & 0xFF);
-
-		tid += intTid;*/
-		/*
-		String country = toHex(payload[startIndex]);
-		String company = new String(payload,startIndex+1,2);
-		String type = new String(payload,startIndex+3,1);
-		StringBuffer buffer = new StringBuffer();
-		for(int i=(startIndex+4);i<(startIndex+4)+4;i++)
-		{
-			buffer.append(toHex(payload[i]));
-		}
-*/	
 		StringBuffer buffer = new StringBuffer();
 
-		for(int i=0;i<8;i++)
+		for(int i=0;i<8;i++,startIndex++)
 		{
 			buffer.append(String.format("%02X",payload[startIndex]));
-			startIndex++;
+			
 		}
 		return buffer.toString();
 	}
@@ -182,5 +236,35 @@ public class TagUtil {
 			temp_temperature = (short) Integer.parseInt(Integer.toBinaryString((payload[temperature_index]) & 0xFF), 2);
 		}
 		return temp_temperature;
+	}
+	/**
+	 *소수점 6자리 변환 
+	 */
+	public static final byte[] convertDoubleToByte(double value)
+	{
+		byte[] data = new byte[4];
+
+		String strValue =String.format("%.6f",value);
+		
+		String lat1 = strValue.substring(0, strValue.indexOf("."));
+
+		String lat2 = strValue.substring(strValue.indexOf(".")+1, strValue.length());
+		
+		data[0] =(byte) Integer.parseInt(lat1);
+		data[1] =(byte) Integer.parseInt(lat2.substring(0, 2));
+		data[2] =(byte) Integer.parseInt(lat2.substring(2, 4));
+		data[3] =(byte) Integer.parseInt(lat2.substring(4, 6));
+		
+		return data;
+	}
+	public static final double convertByteToDouble(byte[] value)
+	{
+		
+		String strValue = (value[0] & 0xFF) + "." + 
+				String.format("%02d",value[1] & 0xFF)+ 
+				String.format("%02d",value[2] & 0xFF)+
+				String.format("%02d",value[3] & 0xFF);
+		return Double.valueOf(strValue);
+
 	}
 }

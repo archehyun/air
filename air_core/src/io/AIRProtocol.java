@@ -21,6 +21,9 @@ public interface AIRProtocol {
 	public static final byte EXT2							= (byte)0x2D;
 	public static final byte STX							= (byte)0x8F;
 	
+	public static final byte ACTIVATION_REQUEST_ACK		 =	(byte)0x41;
+	public static final byte DISTANCE_CONDITION			 = 	(byte)0x44;	//거리 요청
+	
 	
 	public static final int DATA_MESSAGE_START_INDEX 		= 6;
 	

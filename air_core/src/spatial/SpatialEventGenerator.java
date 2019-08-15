@@ -6,6 +6,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import buffer.dao.TableBufferManager;
+import buffer.info.LocationInfo;
+import buffer.info.SpatialEventTable;
+import buffer.info.WorkingMemoryTable;
 import lib.geometry.Point;
 import lib.geometry.Quadrangle;
 import lib.geometry.SpatialOperator;
@@ -14,13 +18,8 @@ import lib.rtree.TempRtree;
 import msg.node.InboundMsgForData;
 import msg.node.TagControlMsgForDistanceConditionChange;
 import msg.queue.InboundDataMsgQueueForSEG;
-import msg.queue.TagControlMsgQueue;
 import msg.queue.TagMsgQueue;
 import server.AIRThread;
-import buffer.dao.TableBufferManager;
-import buffer.info.LocationInfo;
-import buffer.info.SpatialEventTable;
-import buffer.info.WorkingMemoryTable;
 
 /**
  * 태그 위치를 기반으로 Spatial Event를 생성하여 DB에 저장하는 객체
@@ -57,9 +56,13 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 		{
 			try{
 				InboundMsgForData msg = (InboundMsgForData) inboundQueue.poll();
+				
 				tid =msg.getTid();
+				
 				msg.setCid("testC1");
+				
 				Point point = new Point(msg.getLongitude(), msg.getLatitude());
+				
 				int recentEvent=-1;
 				try{
 					recentEvent = workingMemory.getRecentEvent(msg.getTid(), msg.getCid());
@@ -83,7 +86,7 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 					 *  	- 다음 이벤트로서 검색한 거점으로의 INTO 또는 THROUGH 체크를 위한 메세지 전송
 					 */
 
-					logger.debug("SPATIAL_EVENT_INTO");
+					logger.info("SPATIAL_EVENT_INTO");
 
 					LocationInfo op = new LocationInfo();
 					op.setLocation_code(String.valueOf(workingMemory.getRecentLogisticsAreaID(msg.getTid(), msg.getCid())));
@@ -94,7 +97,7 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 					if (SpatialOperator.in(point, area.getBoundary()))
 					{
 
-						logger.debug("SPATIAL_EVENT_INTO TRUE");
+						logger.info("SPATIAL_EVENT_INTO TRUE");
 						notifyMonitor(formatter.format(new Date()).toString()+" "+tid+":IN 공간 이벤트("+area.getLocation_name()+")");
 						sendTagControlMsgForOUTOF(msg, area);
 
@@ -111,7 +114,7 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 				case SpatialEventTable.SPATIAL_EVENT_OUTOF:
 					//notifyMonitor("공간 이벤트:OUTOF");
 				case SpatialEventTable.SPATIAL_EVENT_THROUGH:
-					logger.debug("SPATIAL_EVENT_THROUGH");
+					logger.info("SPATIAL_EVENT_THROUGH");
 					/*
 					 *  현재 거점이 게이트 타입인 경우
 					 *  	- 현재 거점을 THROUGH 한 경우
@@ -171,7 +174,6 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 
 						if (SpatialOperator.in(point, area.getBoundary()))
 						{
-
 							logger.debug("in true:");
 							notifyMonitor(formatter.format(new Date()).toString()+" "+tid+":INTO 공간 이벤트: "+area.getLocation_name());
 							eventTable.insertEvent(tid, cid, msg.getYear(), msg.getMonth(), msg.getDay(), msg.getHour(), msg.getMinute(), area.getLogisticsAreaID(), SpatialEventTable.SPATIAL_EVENT_INTO);							
@@ -224,7 +226,8 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 		Point point = new Point(msg.getLongitude(), msg.getLatitude());
 		LogisticsArea area = rtree.getNearestLogisticsArea(point);
 
-		logger.info("초기화, 최근접 물류거점:"+area.getLocation_name());
+		logger.info("초기화, 최근접 물류거점:"+area.getLocation_name()+","+area.getBoundary());
+		
 		if (SpatialOperator.in(point, area.getBoundary()))
 		{
 			/* 물류거점 안에서 출발
@@ -335,10 +338,11 @@ public class SpatialEventGenerator extends AIRThread implements Runnable
 	 */
 	public void sendTagControlMsgForINTO_THROUGH(InboundMsgForData msg, LogisticsArea area)
 	{
-		logger.debug("태그 메세지 전송");
+		logger.info("태그 메세지 전송");
+		
 		Point point = new Point(msg.getLongitude(), msg.getLatitude());
 
-		logger.debug("areaName:"+area.getLocation_name()+",isGate:"+area.isGate()+",hasGate:"+area.hasGate());
+		logger.info("areaName:"+area.getLocation_name()+",isGate:"+area.isGate()+",hasGate:"+area.hasGate());
 		if (area.isGate())
 		{
 			logger.debug(area.getLocation_name()+":isGate:True");

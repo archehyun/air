@@ -106,6 +106,9 @@ public class LocationInfo extends AIRTable{
 	{
 		return new MBR(getX1(), getY1(), getX3(), getY3());
 	}
-
+	public String toString()
+	{
+		return location_code;
+	}
 
 }

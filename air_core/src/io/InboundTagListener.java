@@ -4,7 +4,15 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Calendar;
 
+/**
+ * 
+ * TAG 메세지 종류에 따라 처리
+ * 
+ * @author 박창현
+ *
+ */
 public class InboundTagListener extends InboundListener implements Runnable{
 	
 	private static InboundTagListener inboundListener;
@@ -17,7 +25,7 @@ public class InboundTagListener extends InboundListener implements Runnable{
 	}
 	
 	
-	private IFInbound inboundInterface;
+	private IFInbound IFInbound;
 	
 	
 	private byte[] buf;
@@ -27,10 +35,28 @@ public class InboundTagListener extends InboundListener implements Runnable{
 	private String tid, cid = null, gps_valid, tagIPaddr;
 	
 	TagUtil tagUtil;
+
+
+	private short year;
+
+
+	private byte month;
+
+
+	private byte day;
+
+
+	private byte hour;
+
+
+	private byte minute;
+
+
+	private byte second;
 	
 	private InboundTagListener() {
 		port=10002; // UDP port:default:10002
-		inboundInterface = new InboundTagInterfaceImpl(this);
+		IFInbound = new InboundTagInterfaceImpl(this);
 		tagUtil= new TagUtil();
 	}
 
@@ -58,7 +84,6 @@ public class InboundTagListener extends InboundListener implements Runnable{
 
 				byte[] payload = inPacket.getData();
 
-
 				
 				if (payload[0] == AIRProtocol.STX) { // STX
 
@@ -66,6 +91,7 @@ public class InboundTagListener extends InboundListener implements Runnable{
 					tagIPaddr 	= tagUtil.extractedTagIP(inPacket);
 
 					cid = "con001";  // 수정 필요
+					
 					tid = tagUtil.extractedTID(payload, 2);
 
 					logger.info("tag access => tid: " + tid+", ip:"+ tagIPaddr);					
@@ -74,42 +100,42 @@ public class InboundTagListener extends InboundListener implements Runnable{
 					switch (payload[1]) { 
 
 					case AIRProtocol.ACTIVATION_REQUEST:  		//0x21
-						inboundInterface.activationRequest(payload, inPacket);
+						IFInbound.activationRequest(payload, inPacket);
 						break;
 
 					case AIRProtocol.ACTIVATION_REQUEST_RE_ACK: //0x22
-						inboundInterface.activationRequestReAck(payload);
+						IFInbound.activationRequestReAck(payload);
 						break;
 
 					case AIRProtocol.ACTIVATION_PERMISSION_ACK:	//0x23
-						inboundInterface.activationPermissionAck(payload);
+						IFInbound.activationPermissionAck(payload);
 						break;
 
 					case AIRProtocol.SEG:						//0x24
-						inboundInterface.seg(payload);
+						IFInbound.seg(payload);
 						break;
 
 					case AIRProtocol.DISTANCE_CONDITION_ACK:    //0x25
-						inboundInterface.distanceContiditionAck(payload);
+						IFInbound.distanceContiditionAck(payload);
 						break;
 
 					case AIRProtocol.CQP:						//0x26
-						inboundInterface.cqp(payload,inPacket);
+						IFInbound.cqp(payload,inPacket);
 						break;
 
 					case AIRProtocol.HEARTBEAT:					//0x27
-						inboundInterface.heartbeat(payload);
+						IFInbound.heartbeat(payload);
 						break;
 
 					case AIRProtocol.IP_CHANGE:					//0x28
-						inboundInterface.ipChange(payload, inPacket);
+						IFInbound.ipChange(payload, inPacket);
 						break;
 
 					case AIRProtocol.ACTUATOR_ACK:				//0x29
-						inboundInterface.actuatorAck(payload);
+						IFInbound.actuatorAck(payload);
 						break;
 					case AIRProtocol.QUERY_CONDTION_ACK:				//0x30
-						inboundInterface.queryConditionAck(payload);
+						IFInbound.queryConditionAck(payload);
 						break;						
 					default:
 
@@ -145,6 +171,16 @@ public class InboundTagListener extends InboundListener implements Runnable{
 	public void setPort(int port) 
 	{
 		this.port = port;
+	}
+	
+	private void updateCurrentDateTime() {
+
+		year = (short) Calendar.getInstance().get(Calendar.YEAR);
+		month = (byte) Calendar.getInstance().get(Calendar.MONTH);
+		day = (byte) Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+		hour = (byte) Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		minute= (byte) Calendar.getInstance().get(Calendar.MINUTE);
+		second= (byte) Calendar.getInstance().get(Calendar.SECOND);
 	}
 	
 

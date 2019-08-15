@@ -30,7 +30,6 @@ public class InboundTagInterfaceImpl implements IFInbound {
 
 	public InboundTagInterfaceImpl(InboundTagListener inboundListener) {
 		this.inboundListener=inboundListener;
-
 	}
 	protected Logger 			logger = Logger.getLogger(getClass());
 
@@ -54,7 +53,6 @@ public class InboundTagInterfaceImpl implements IFInbound {
 
 	//연도
 	private short year;
-
 	
 	private byte month, day, hour, minute,second;
 
@@ -69,7 +67,9 @@ public class InboundTagInterfaceImpl implements IFInbound {
 	private int data_start_index=2;
 
 	private int TID_LENGTH=8;
+	
 	private int CID_LENGTH=11;
+	
 	private int GPS_LENGTH=11;
 
 	/**
@@ -91,9 +91,9 @@ public class InboundTagInterfaceImpl implements IFInbound {
 	 * @param payload
 	 * @param inPacket
 	 */
-	public void activationRequest(byte[] payload, DatagramPacket inPacket) {	
+	public void activationRequest(byte[] payload, DatagramPacket inPacket) {
 		try{
-			logger.info("activationRequest");		
+			logger.info("activationRequest");
 			// 6번째 바이트 부터 11개의 바이트 추출
 
 			// index가 0부터 시작
@@ -101,7 +101,7 @@ public class InboundTagInterfaceImpl implements IFInbound {
 
 			cid 		= new String(payload, 10, 21);// stx:1, type:1, tid:8+ cid:11		
 
-			inboundListener.notifyMonitor(dateFormat.format(System.currentTimeMillis())+" activationRequest "+tid);
+			inboundListener.notifyMonitor(dateFormat.format(System.currentTimeMillis())+" ACTIVATION_REQUEST "+tid);
 
 			
 			tagIPaddr = inPacket.getAddress().getHostAddress();
@@ -155,7 +155,6 @@ public class InboundTagInterfaceImpl implements IFInbound {
 
 			// startIndex:2, length: 8 
 			tid 		= tagUtil.extractedTID(payload, data_start_index);
-			System.out.println("extreacted tid:"+tid);
 
 			/* GPS데이터 유효성 체크 : GPS 데이터를 받을 수 없는 곳에서는 'V'라고 표시되며, 정상 수신한 경우 'A'
 			 * gps_valid_index(10) = 2 + 8;
@@ -176,6 +175,7 @@ public class InboundTagInterfaceImpl implements IFInbound {
 			 * door(29) : 			1byte(0x00:닫힘, 0x01:열림, 0x02:확인불가)
 			 */
 			int state_data_start_index = gps_valid_start_index+GPS_LENGTH;
+			
 			temperature	= tagUtil.extractTemperature(payload, state_data_start_index);
 			humidity 	= (byte)payload[state_data_start_index+1];
 			hit			= tagUtil.extractHit(payload,state_data_start_index+2);
@@ -183,8 +183,7 @@ public class InboundTagInterfaceImpl implements IFInbound {
 
 			logger.info("\n위치(lat,lng): " + latlng[0]+","+latlng[1]+"\ntemperature: " + temperature+",humidity: " + humidity+
 					"\nhitX: " + hit[0] + ",hity: " + hit[1] + ",hitZ: " + hit[2]+",door: " + door+"\n");
-			/*notifyMonitor("위치(lat,lng): " + latlng[0]+","+latlng[1]+"\n"+"temperature: " + temperature+",humidity: " + humidity+
-				"\nhitX: " + hit[0] + ",hity: " + hit[1] + ",hitZ: " + hit[2]+",door: " + door+"\n");*/
+			
 
 			StringBuffer strHit = new StringBuffer();
 
@@ -372,7 +371,7 @@ public class InboundTagInterfaceImpl implements IFInbound {
 	 */
 	public void seg(byte[] payload) {
 
-		logger.info("seg:"+payload);
+		logger.info("seg process:");
 
 
 		/*
@@ -392,9 +391,13 @@ public class InboundTagInterfaceImpl implements IFInbound {
 		 * GPS데이터 유효성 체크 : GPS 데이터를 받을 수 없는 곳에서는 'V'라고 표시되며, 정상 수신한 경우 'A'
 		 * gps_valid_index(21) = 2 + 8 + 11;
 		 */
-		int gps_start_index = data_start_index + TID_LENGTH;		 		
+		int gps_start_index = data_start_index + TID_LENGTH;
+		
+		
 		gps_valid 		=  new String(payload, gps_start_index, 1);
+		
 		latlng		= tagUtil.extractedLatLng(payload, gps_start_index+1);
+		//latlng		= tagUtil.extractedLatLng(payload);
 
 		/* 
 		 * #상태 데이터
@@ -436,8 +439,9 @@ public class InboundTagInterfaceImpl implements IFInbound {
 				"\ntemperature: " + temperature+", humidity: " + humidity+
 				"\nhitX: " + hit[0] + ",\t hity: " + hit[1] + ",\t hitZ: " + hit[2]+
 				"\ndoor: " + door+"\n");
-		inboundListener.notifyMonitor("태그ID:"+tid+", 온도:" + temperature+", 습도:" + humidity+"%"
-				+", 위도:"+latlng[0]+","+", 경도:"+latlng[1]);
+		
+		
+		inboundListener.notifyMonitor(dateFormat.format(System.currentTimeMillis())+ " SPATIAL_EVENT      "+tid+", 위도:"+latlng[0]+","+", 경도:"+latlng[1]);
 
 		inboundDataMsgQueueForSEG.append(new InboundMsgForData(tid, cid, year, month, day, hour, minute, latlng[0], latlng[1], temperature, humidity, hit[0], hit[1], hit[2], door));
 

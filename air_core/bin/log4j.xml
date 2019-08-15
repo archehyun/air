@@ -87,7 +87,7 @@
         </layout>
     </appender>
     <root>
-        <level value="info">
+        <level value="debug">
         
         </level>
         	

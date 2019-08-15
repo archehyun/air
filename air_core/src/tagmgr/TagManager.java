@@ -122,7 +122,6 @@ public class TagManager extends AIRThread implements Runnable{
 				
 				if(searchTag.getIs_activate().equals("0"))
 				{
-					
 					TagInfo updateItem = new TagInfo();
 
 					updateItem.setTid(tagID);
